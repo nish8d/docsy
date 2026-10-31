@@ -2,5 +2,6 @@
 
 {% block announce %}
   You're viewing docs for <strong>Tidewatch v1</strong>, which is no longer maintained.
-  <a href="{{ config.site_url }}latest/">See the latest version</a>.
+  {#- base_url is this version's root (e.g. /docsy/v1), so ../latest is its sibling. #}
+  <a href="{{ base_url }}/../latest/">See the latest version</a>.
 {% endblock %}
