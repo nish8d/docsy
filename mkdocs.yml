@@ -1,0 +1,68 @@
+site_name: Tidewatch
+site_description: Watch folders, run tasks when files change.
+site_url: https://nish8d.github.io/docsy/
+repo_url: https://github.com/nish8d/docsy
+repo_name: nish8d/docsy
+edit_uri: ""
+
+theme:
+  name: material
+  icon:
+    logo: material/waves
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+extra:
+  version:
+    provider: mike
+    default: latest
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.keys
+  - tables
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Installation: installation.md
+      - Quickstart: quickstart.md
+  - Reference:
+      - Configuration: configuration.md
+      - CLI: cli.md
+      - Plugins: plugins.md
+  - Upgrading:
+      - Migrating from v1: migrating-from-v1.md
+      - Changelog: changelog.md

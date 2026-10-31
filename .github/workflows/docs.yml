@@ -1,0 +1,62 @@
+name: docs
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# All deploys write to the same gh-pages branch, so run them one at a time.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # mike needs full history and the gh-pages ref
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build (strict)
+        run: mkdocs build --strict
+
+      # Branch -> docs version. Branches not listed here build but never deploy.
+      - name: Map branch to version
+        id: map
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v2)   version=v2;  alias=latest ;;
+            v1)   version=v1;  alias=     ;;
+            main) version=dev; alias=     ;;
+            *)    version=;    alias=     ;;
+          esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "alias=$alias" >> "$GITHUB_OUTPUT"
+          echo "Branch '$GITHUB_REF_NAME' -> version '${version:-<none>}' alias '${alias:-<none>}'"
+
+      - name: Deploy with mike
+        if: steps.map.outputs.version != ''
+        env:
+          VERSION: ${{ steps.map.outputs.version }}
+          ALIAS: ${{ steps.map.outputs.alias }}
+        run: |
+          git config user.name "nish8d"
+          git config user.email "184851041+nish8d@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages || true # absent on the very first deploy
+          if [ -n "$ALIAS" ]; then
+            mike deploy --push --update-aliases "$VERSION" "$ALIAS"
+            mike set-default --push "$ALIAS"
+          else
+            mike deploy --push "$VERSION"
+          fi
