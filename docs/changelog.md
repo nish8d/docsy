@@ -1,10 +1,5 @@
 # Changelog
 
-## Unreleased
-
-- `tidewatch once --parallel` now prints a summary table when all tasks finish.
-- New `cwd` and `env` task keys.
-
 ## 2.0.0
 
 **Breaking changes:** see [Migrating from v1](migrating-from-v1.md).
