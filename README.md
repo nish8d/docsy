@@ -39,8 +39,10 @@ The interesting parts are in [`.github/workflows/docs.yml`](.github/workflows/do
   header. Deploying `v1` only rewrites `v1/`; every other version is left untouched.
 - **Branch-based deployment.** A single `case` statement maps the pushed branch to a docs
   version and an optional alias. The same workflow file lives on every branch.
-- **No deploy races.** All deploys share the `gh-pages` concurrency group, so two branches
-  pushed close together queue instead of overwriting each other's commit.
+- **Build and deploy are separate jobs.** Every branch runs `build`. Only `main`, `v1`
+  and `v2` run `deploy`, which sits in the `gh-pages` concurrency group, so deploys from
+  different branches queue instead of racing on the same branch. Build-only pushes stay
+  outside that queue and can't bump a waiting deploy.
 - **Fail fast.** `mkdocs build --strict` turns broken links and nav mistakes into a failed
   build before anything deploys.
 
