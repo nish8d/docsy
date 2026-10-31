@@ -2,23 +2,20 @@ name: docs
 
 on:
   push:
+    branches: ["**"] # branches only; tags never deploy
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# All deploys write to the same gh-pages branch, so run them one at a time.
-concurrency:
-  group: gh-pages
-  cancel-in-progress: false
-
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.map.outputs.version }}
+      alias: ${{ steps.map.outputs.alias }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # mike needs full history and the gh-pages ref
 
       - uses: actions/setup-python@v5
         with:
@@ -45,11 +42,32 @@ jobs:
           echo "alias=$alias" >> "$GITHUB_OUTPUT"
           echo "Branch '$GITHUB_REF_NAME' -> version '${version:-<none>}' alias '${alias:-<none>}'"
 
+  deploy:
+    needs: build
+    if: needs.build.outputs.version != ''
+    runs-on: ubuntu-latest
+    # Only deploys write to gh-pages, so only deploys share this queue.
+    # Build-only runs on other branches can't cancel a waiting deploy.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # mike needs full history and the gh-pages ref
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Deploy with mike
-        if: steps.map.outputs.version != ''
         env:
-          VERSION: ${{ steps.map.outputs.version }}
-          ALIAS: ${{ steps.map.outputs.alias }}
+          VERSION: ${{ needs.build.outputs.version }}
+          ALIAS: ${{ needs.build.outputs.alias }}
         run: |
           git config user.name "nish8d"
           git config user.email "184851041+nish8d@users.noreply.github.com"
