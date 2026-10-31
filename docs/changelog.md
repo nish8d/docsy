@@ -1,27 +1,14 @@
 # Changelog
 
-## Unreleased
-
-- `tidewatch once --parallel` now prints a summary table when all tasks finish.
-- New `cwd` and `env` task keys.
-
-## 2.0.0
-
-**Breaking changes:** see [Migrating from v1](migrating-from-v1.md).
-
-- Config moved from `tidewatch.ini` to `tidewatch.yaml`.
-- `tidewatch run` split into `tidewatch watch` and `tidewatch once`.
-- Debounce is now set in milliseconds with `debounce_ms`.
-- New plugin system with built-in `notify`, `restart` and `git-filter` plugins.
-- `tidewatch init --from tidewatch.ini` converts v1 configs.
-
 ## 1.2.0
 
-- `ignore` patterns in each watch section.
+- `ignore` key in each `[watch:<name>]` section.
+- `--section` flag to run a subset of sections.
 
 ## 1.1.0
 
 - `--once` flag for CI.
+- `[defaults]` section for a global `delay`.
 
 ## 1.0.0
 
